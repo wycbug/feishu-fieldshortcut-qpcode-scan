@@ -1,0 +1,22 @@
+{
+  "name": "feishu-file-exif",
+  "version": "1.0.0",
+  "description": "Feishu Base (多维表格) field shortcut: extract exif from image attachment",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "block-basekit-cli start:field",
+    "build": "block-basekit-cli build:field",
+    "pack": "block-basekit-cli pack:field",
+    "dev": "block-basekit-cli dev:field"
+  },
+  "author": "wycbug",
+  "license": "MIT",
+  "devDependencies": {
+    "@lark-opdev/block-basekit-cli": "1.0.5"
+  },
+  "dependencies": {
+    "@lark-opdev/block-basekit-server-api": "1.0.6",
+    "canvas": "^3.2.0",
+    "jsqr": "^1.4.0"
+  }
+}
