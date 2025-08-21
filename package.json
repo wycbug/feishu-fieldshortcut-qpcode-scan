@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@lark-opdev/block-basekit-server-api": "1.0.6",
-    "canvas": "^3.2.0",
-    "jsqr": "^1.4.0"
+    "jimp": "^1.6.0",
+    "qr": "^0.5.1"
   }
 }

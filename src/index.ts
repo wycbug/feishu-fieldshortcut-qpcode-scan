@@ -6,8 +6,8 @@ import {
   FieldCode,
   FieldContext,
 } from "@lark-opdev/block-basekit-server-api";
-import jsQR from "jsqr";
-import { createCanvas, loadImage } from "canvas";
+import decodeQR from "qr/decode.js";
+import { Jimp } from "jimp";
 const { t } = field;
 
 // 标准化日志上下文信息，便于检索
@@ -108,7 +108,9 @@ basekit.addField({
       );
 
       // 处理单选附件字段（仍然是数组格式，取第一个）
-      const attachmentArray = Array.isArray(formItemParams.file) ? formItemParams.file : [formItemParams.file];
+      const attachmentArray = Array.isArray(formItemParams.file)
+        ? formItemParams.file
+        : [formItemParams.file];
       const attachment = attachmentArray[0];
       if (!attachment) {
         return {
@@ -117,10 +119,10 @@ basekit.addField({
           msg: t("noFieldsSelected"),
         };
       }
-      
+
       const url = attachment?.tmp_url || attachment?.url || attachment?.link;
       const filename = attachment?.name || "unknown";
-      
+
       if (!url) {
         return {
           code: FieldCode.Success,
@@ -131,7 +133,7 @@ basekit.addField({
 
       try {
         console.log(`${formatContext(context)} 开始处理文件: ${filename}`);
-        
+
         // 下载图片文件
         const response = await fetch(url);
         if (!response.ok) {
@@ -144,22 +146,21 @@ basekit.addField({
 
         const buffer = await response.arrayBuffer();
         
-        // 使用Node.js canvas处理图像
-        const img = await loadImage(Buffer.from(buffer));
-        const canvas = createCanvas(img.width, img.height);
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
+        // 使用jimp解码图片获取像素数据
+        const image = await Jimp.read(Buffer.from(buffer));
+        const { width, height, data } = image.bitmap;
         
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        // 构造qr库需要的Image格式
+        const qrImage = { width, height, data };
         
-        // 使用jsQR扫描二维码
-        const code = jsQR(imageData.data, imageData.width, imageData.height);
-        
-        if (code) {
-          console.log(`${formatContext(context)} 二维码扫描成功: ${code.data}`);
+        // 使用@paulmillr/qr库识别二维码
+        const result = decodeQR(qrImage);
+
+        if (result) {
+          console.log(`${formatContext(context)} 二维码扫描成功: ${result}`);
           return {
             code: FieldCode.Success,
-            data: code.data,
+            data: result,
             msg: t("parseSuccess"),
           };
         } else {
@@ -169,10 +170,13 @@ basekit.addField({
             msg: t("noQRData"),
           };
         }
-        
       } catch (fileError) {
-        console.error(`${formatContext(context)} 处理文件 ${filename} 时出错:`, fileError);
-        const errMsg = fileError instanceof Error ? fileError.message : "未知错误";
+        console.error(
+          `${formatContext(context)} 处理文件 ${filename} 时出错:`,
+          fileError
+        );
+        const errMsg =
+          fileError instanceof Error ? fileError.message : "未知错误";
         return {
           code: FieldCode.Success,
           data: `${t("parseFailed")} - ${errMsg}`,
