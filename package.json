@@ -1,7 +1,7 @@
 {
-  "name": "feishu-file-exif",
+  "name": "feishu-qpcode-scan",
   "version": "1.0.0",
-  "description": "Feishu Base (多维表格) field shortcut: extract exif from image attachment",
+  "description": "Feishu Base (多维表格) field shortcut: scan qr code from image attachment",
   "main": "src/index.ts",
   "scripts": {
     "start": "block-basekit-cli start:field",
