@@ -28,7 +28,7 @@ function formatContext(ctx: FieldContext): string {
     .map((kv) => `[${kv}]`)
     .join(" ");
 }
-
+basekit.addDomainList(["feishu.cn"]);
 basekit.addField({
   // 定义捷径的i18n语言资源
   i18n: {
